@@ -8,13 +8,16 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
     int numeroDeFallos = 0;
+    int numeroDeAciertos = 0;
     String palabraOculta = "";
-
+    boolean gameOver = false;
+    ArrayList<View> pressedButtons = new ArrayList<View>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,18 +37,49 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < palabraOculta.length(); i++) huecos += "_ ";
 
         ((TextView) findViewById(R.id.palabraConGuiones)).setText(huecos.trim());
+
+        findViewById(R.id.resetButton).setVisibility(View.INVISIBLE);
     }
 
     private String word(){
-        String[] wordList = {"CETYS", "TEST", "HOLA", "ADIOS"};
+        String[] wordList = {"CETYS", "TEST", "HOLA", "ADIOS", "VLADIKAKA", "BORREGUITO", "BABYYODA"};
         Random rand = new Random();
         return wordList[rand.nextInt(wordList.length)];
     }
 
     public void botonPulsado (View vista){
-        Button boton = findViewById(vista.getId());
-        boton.setVisibility(View.INVISIBLE);
-        chequeaLetra(boton.getText().toString());
+        if (!gameOver) {
+            pressedButtons.add(findViewById(vista.getId()));
+            Button boton = findViewById(vista.getId());
+            boton.setVisibility(View.INVISIBLE);
+            chequeaLetra(boton.getText().toString());
+
+        }
+    }
+
+    public void reset (View vista){
+        if (gameOver) {
+            numeroDeFallos = 0;
+            numeroDeAciertos = 0;
+            gameOver = false;
+
+            Button boton = findViewById(vista.getId());
+            boton.setVisibility(View.INVISIBLE);
+
+            for (View botones : pressedButtons){
+                botones.setVisibility(View.VISIBLE);
+            }
+
+            ImageView imagenAhorcado = ((ImageView) findViewById(R.id.imagenAhorcado));
+            imagenAhorcado.setImageResource(R.drawable.ahorcado_0);
+
+            palabraOculta = word();
+            String huecos = "";
+            for (int i = 0; i < palabraOculta.length(); i++) huecos += "_ ";
+
+            ((TextView) findViewById(R.id.palabraConGuiones)).setText(huecos.trim());
+        }
+
     }
 
     private void chequeaLetra(String letra){
@@ -63,6 +97,11 @@ public class MainActivity extends AppCompatActivity {
                         + letra
                         + palabraConGuiones.substring(2*i+1);
                 acierto = true;
+                numeroDeAciertos++;
+                if (numeroDeAciertos == palabraOculta.length()){
+                    gameOver = true;
+                    findViewById(R.id.resetButton).setVisibility(View.VISIBLE);
+                }
             }
         }
         if (!palabraConGuiones.contains("_")){
@@ -81,6 +120,10 @@ public class MainActivity extends AppCompatActivity {
                 case 4 : imagenAhorcado.setImageResource(R.drawable.ahorcado_4); break;
                 case 5 : imagenAhorcado.setImageResource(R.drawable.ahorcado_5); break;
                 default : imagenAhorcado.setImageResource(R.drawable.ahorcado_fin); break;
+            }
+            if (numeroDeFallos > 5){
+                gameOver = true;
+                findViewById(R.id.resetButton).setVisibility(View.VISIBLE);
             }
         }
 
