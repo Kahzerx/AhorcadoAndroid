@@ -70,6 +70,8 @@ public class MainActivity extends AppCompatActivity {
                 botones.setVisibility(View.VISIBLE);
             }
 
+            pressedButtons.clear();
+
             ImageView imagenAhorcado = ((ImageView) findViewById(R.id.imagenAhorcado));
             imagenAhorcado.setImageResource(R.drawable.ahorcado_0);
 
